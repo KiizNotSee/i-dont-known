@@ -313,12 +313,7 @@
         ═══════════════════════════════════ */
         .preview-box{
           background:var(--cream);border:1px solid var(--border);
-          border-radius:var(--r-md);padding:12px 14px;margin-top:14px;
-        }
-        .preview-title{
-          font-size:0.67rem;font-weight:700;
-          text-transform:uppercase;letter-spacing:0.08em;
-          color:var(--ink-muted);margin-bottom:7px;
+          border-radius:var(--r-md);padding:12px 14px;
         }
         .preview-text{
           font-family:'Crimson Pro',serif;
@@ -426,7 +421,6 @@
 
 <body>
 
-    <!-- TOP NAV -->
     <nav class="topnav">
         <div class="nav-logo">
             <div class="nav-logo-icon">📝</div>
@@ -440,7 +434,6 @@
         </div>
     </nav>
 
-    <!-- SUBJECT BAR -->
     <div class="subject-bar">
         <button class="stab on-toan" id="stab-toan" onclick="switchSubj('toan')">
             <span class="sdot" style="background:var(--math)"></span>Toán
@@ -453,10 +446,8 @@
         </button>
     </div>
 
-    <!-- SCROLL AREA -->
     <div class="scroll-wrap">
 
-        <!-- ── TOÁN ── -->
         <div class="subj-wrap visible" id="sw-toan">
             <div class="sec-panel visible" id="sp-toan-1">
                 <div class="sec-card">
@@ -521,15 +512,30 @@
                         </div>
                     </div>
                     <div class="sa-grid" id="sa-toan"></div>
+                </div>
+            </div>
+            <div class="sec-panel" id="sp-toan-4">
+                <div class="sec-card">
+                    <div class="sec-head">
+                        <div>
+                            <div class="sec-lbl" style="color:var(--ink-muted)">
+                                <svg width="12" height="12" fill="none" viewBox="0 0 16 16">
+                                    <path d="M8 3C4 3 1 8 1 8s3 5 7 5 7-5 7-5-3-5-7-5z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                    <circle cx="8" cy="8" r="2.5" stroke="currentColor" stroke-width="1.5" />
+                                </svg>
+                                Tổng hợp · Toán
+                            </div>
+                            <h2 class="sec-title">Xem trước kết quả</h2>
+                            <p class="sec-meta">Kiểm tra lại đáp án của bạn</p>
+                        </div>
+                    </div>
                     <div class="preview-box">
-                        <div class="preview-title">Xem trước · Toán</div>
                         <div class="preview-text" id="pv-toan">—</div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- ── VẬT LÝ ── -->
         <div class="subj-wrap" id="sw-ly">
             <div class="sec-panel visible" id="sp-ly-1">
                 <div class="sec-card">
@@ -594,15 +600,30 @@
                         </div>
                     </div>
                     <div class="sa-grid" id="sa-ly"></div>
+                </div>
+            </div>
+            <div class="sec-panel" id="sp-ly-4">
+                <div class="sec-card">
+                    <div class="sec-head">
+                        <div>
+                            <div class="sec-lbl" style="color:var(--ink-muted)">
+                                <svg width="12" height="12" fill="none" viewBox="0 0 16 16">
+                                    <path d="M8 3C4 3 1 8 1 8s3 5 7 5 7-5 7-5-3-5-7-5z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                    <circle cx="8" cy="8" r="2.5" stroke="currentColor" stroke-width="1.5" />
+                                </svg>
+                                Tổng hợp · Vật lý
+                            </div>
+                            <h2 class="sec-title">Xem trước kết quả</h2>
+                            <p class="sec-meta">Kiểm tra lại đáp án của bạn</p>
+                        </div>
+                    </div>
                     <div class="preview-box">
-                        <div class="preview-title">Xem trước · Vật lý</div>
                         <div class="preview-text" id="pv-ly">—</div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- ── HÓA HỌC ── -->
         <div class="subj-wrap" id="sw-hoa">
             <div class="sec-panel visible" id="sp-hoa-1">
                 <div class="sec-card">
@@ -667,23 +688,36 @@
                         </div>
                     </div>
                     <div class="sa-grid" id="sa-hoa"></div>
+                </div>
+            </div>
+            <div class="sec-panel" id="sp-hoa-4">
+                <div class="sec-card">
+                    <div class="sec-head">
+                        <div>
+                            <div class="sec-lbl" style="color:var(--ink-muted)">
+                                <svg width="12" height="12" fill="none" viewBox="0 0 16 16">
+                                    <path d="M8 3C4 3 1 8 1 8s3 5 7 5 7-5 7-5-3-5-7-5z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                    <circle cx="8" cy="8" r="2.5" stroke="currentColor" stroke-width="1.5" />
+                                </svg>
+                                Tổng hợp · Hóa học
+                            </div>
+                            <h2 class="sec-title">Xem trước kết quả</h2>
+                            <p class="sec-meta">Kiểm tra lại đáp án của bạn</p>
+                        </div>
+                    </div>
                     <div class="preview-box">
-                        <div class="preview-title">Xem trước · Hóa học</div>
                         <div class="preview-text" id="pv-hoa">—</div>
                     </div>
                 </div>
             </div>
         </div>
 
-    </div><!-- /scroll-wrap -->
-
-    <!-- FAB -->
+    </div>
     <div class="fab-row">
         <button class="btn btn-ghost" onclick="resetCur()">Xóa môn này</button>
         <button class="btn btn-primary" id="copyBtn" onclick="doCopy()">Sao chép kết quả</button>
     </div>
 
-    <!-- BOTTOM BAR -->
     <div class="bottom-bar">
         <button class="btab on-toan" id="bt-1" onclick="switchPart(1)">
             <span class="btab-icon">◎</span>Phần I
@@ -693,6 +727,9 @@
         </button>
         <button class="btab" id="bt-3" onclick="switchPart(3)">
             <span class="btab-icon">≡</span>Phần III
+        </button>
+        <button class="btab" id="bt-4" onclick="switchPart(4)">
+            <span class="btab-icon">👁</span>Xem
         </button>
     </div>
 
@@ -738,7 +775,6 @@
             document.getElementById('sw-'+k).className =
               'subj-wrap' + (k===s ? ' visible' : '');
           });
-          // re-apply part highlight with new subject color
           applyPartTabs();
           updateProgress();
         }
@@ -748,21 +784,21 @@
         ══════════════════════════════ */
         function switchPart(p) {
           curP = p;
+          // Cập nhật mảng duyệt thành [1, 2, 3, 4]
           ['toan','ly','hoa'].forEach(s => {
-            [1,2,3].forEach(n => {
+            [1,2,3,4].forEach(n => {
               const el = document.getElementById('sp-'+s+'-'+n);
               if(el) el.className = 'sec-panel' + (n===p ? ' visible' : '');
             });
           });
           applyPartTabs();
-          // Scroll to top when switching parts
           document.querySelector('.scroll-wrap').scrollTop = 0;
           window.scrollTo(0,0);
         }
         function applyPartTabs() {
-          [1,2,3].forEach(n => {
+          [1,2,3,4].forEach(n => {
             const bt = document.getElementById('bt-'+n);
-            bt.className = 'btab' + (n===curP ? ' on-'+curS : '');
+            if(bt) bt.className = 'btab' + (n===curP ? ' on-'+curS : '');
           });
         }
         
@@ -887,10 +923,11 @@
             .replace(/(PART\d:)/g,'<span class="tag">$1</span>')
             .replace(/\b(\?)/g,'<span class="blank">?</span>');
         }
-        function buildFull(){
-          return Object.entries(CFG).map(([k,c])=>
-            `[${c.label.toUpperCase()}]\n`+buildOut(k)
-          ).join('\n\n');
+        
+        // Tạo chuỗi sao chép CHỈ CỦA MÔN ĐANG CHỌN
+        function buildSubject(s){
+          const lbl = CFG[s].label.toUpperCase();
+          return `[${lbl}]\n` + buildOut(s);
         }
         
         /* ══════════════════════════════
@@ -913,11 +950,13 @@
            COPY
         ══════════════════════════════ */
         async function doCopy(){
-          const btn=document.getElementById('copyBtn');
+          const btn = document.getElementById('copyBtn');
           try{
-            await navigator.clipboard.writeText(buildFull());
-            btn.classList.add('done'); btn.textContent='✓ Đã sao chép!';
-            toast('Kết quả đã được sao chép!','ok');
+            // Chỉ sao chép môn học hiện tại (curS)
+            await navigator.clipboard.writeText(buildSubject(curS));
+            btn.classList.add('done'); 
+            btn.textContent='✓ Đã sao chép!';
+            toast(`Đã sao chép môn ${CFG[curS].label}!`, 'ok');
             setTimeout(()=>{
               btn.classList.remove('done');
               btn.textContent='Sao chép kết quả';
