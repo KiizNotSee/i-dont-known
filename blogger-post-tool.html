@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blogger Post Generator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+        :root{
+          --bg:#080a0f;--bg2:#0d1018;--bg3:#131720;
+          --border:rgba(255,255,255,0.07);
+          --text:#e8ecf2;--muted:#6b7a91;
+          --mono:'Space Mono',monospace;--sans:'Syne',sans-serif;
+          --c1:#63b3ed;--c2:#b794f4;--c3:#f6ad55;--c4:#68d391;
+          --r:12px;--tr:0.2s ease;
+        }
+        html{scroll-behavior:smooth}
+        body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+        .wrap{max-width:760px;margin:0 auto;padding:40px 16px 80px;position:relative}
+        
+        /* HEADER */
+        .hdr{text-align:center;margin-bottom:48px}
+        .hdr h1{font-size:clamp(26px,6vw,42px);font-weight:800;letter-spacing:-.03em;background:linear-gradient(135deg,#fff 0%,#8ca8c8 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1.1}
+        .hdr p{margin-top:10px;font-size:13px;color:var(--muted);line-height:1.6}
+        
+        /* PIPELINE */
+        .pipe{display:flex;align-items:center;justify-content:center;margin-bottom:40px}
+        .ps{display:flex;flex-direction:column;align-items:center;gap:5px}
+        .ps-n{width:34px;height:34px;border-radius:50%;border:1.5px solid var(--border);background:var(--bg2);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:12px;font-weight:700;color:var(--muted);transition:var(--tr);position:relative;z-index:1}
+        .ps-l{font-size:10px;font-family:var(--mono);color:var(--muted);text-transform:uppercase;letter-spacing:.07em;white-space:nowrap;transition:var(--tr)}
+        .pc{width:52px;height:1px;background:var(--border);margin-top:-18px;transition:var(--tr)}
+        .ps.a1 .ps-n{border-color:var(--c1);color:var(--c1);background:rgba(99,179,237,.1);box-shadow:0 0 14px rgba(99,179,237,.3)}
+        .ps.a1 .ps-l{color:var(--c1)}
+        .ps.a2 .ps-n{border-color:var(--c2);color:var(--c2);background:rgba(183,148,244,.1);box-shadow:0 0 14px rgba(183,148,244,.3)}
+        .ps.a2 .ps-l{color:var(--c2)}
+        .ps.a3 .ps-n{border-color:var(--c3);color:var(--c3);background:rgba(246,173,85,.1);box-shadow:0 0 14px rgba(246,173,85,.3)}
+        .ps.a3 .ps-l{color:var(--c3)}
+        .ps.a4 .ps-n{border-color:var(--c4);color:var(--c4);background:rgba(104,211,145,.1);box-shadow:0 0 14px rgba(104,211,145,.3)}
+        .ps.a4 .ps-l{color:var(--c4)}
+        .ps.done .ps-n{border-color:var(--c4);background:rgba(104,211,145,.15);color:var(--c4)}
+        .ps.done .ps-n span{display:none}
+        .ps.done .ps-n::after{content:'✓';font-size:13px}
+        .ps.done .ps-l{color:var(--c4)}
+        .pc.done{background:var(--c4);opacity:.4}
+        @media(max-width:480px){.pc{width:24px}.ps-l{font-size:9px}}
+        
+        /* CARDS */
+        .card{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:24px;margin-bottom:14px;display:none;animation:si .25s ease}
+        .card.on{display:block}
+        @keyframes si{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+        
+        /* CARD HEADER */
+        .ch{display:flex;align-items:center;gap:12px;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--border)}
+        .badge{font-family:var(--mono);font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;letter-spacing:.09em;text-transform:uppercase;white-space:nowrap}
+        .b1{background:rgba(99,179,237,.15);color:var(--c1);border:1px solid rgba(99,179,237,.3)}
+        .b2{background:rgba(183,148,244,.15);color:var(--c2);border:1px solid rgba(183,148,244,.3)}
+        .b3{background:rgba(246,173,85,.15);color:var(--c3);border:1px solid rgba(246,173,85,.3)}
+        .b4{background:rgba(104,211,145,.15);color:var(--c4);border:1px solid rgba(104,211,145,.3)}
+        .ct{font-size:15px;font-weight:700;letter-spacing:-.01em}
+        
+        /* FORM */
+        .lbl{display:block;font-family:var(--mono);font-size:10px;letter-spacing:.11em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;font-weight:700}
+        input[type=text],textarea{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:var(--r);padding:11px 14px;font-family:var(--mono);font-size:13px;color:var(--text);outline:none;transition:border-color var(--tr),box-shadow var(--tr);resize:vertical}
+        input[type=text]:focus,textarea:focus{border-color:rgba(99,179,237,.5);box-shadow:0 0 0 3px rgba(99,179,237,.1)}
+        input::placeholder,textarea::placeholder{color:#2d3748}
+        .fld{margin-bottom:16px}
+        .fld:last-child{margin-bottom:0}
+        .frow{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+        @media(max-width:500px){.frow{grid-template-columns:1fr}}
+        
+        /* BUTTONS */
+        .btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:11px 20px;border-radius:9px;border:none;font-family:var(--sans);font-size:13px;font-weight:700;cursor:pointer;transition:all var(--tr);letter-spacing:.01em}
+        .btn:disabled{opacity:.4;cursor:not-allowed}
+        .bfull{width:100%}
+        .bpri{background:linear-gradient(135deg,#3a7bd5,#5a67d8);color:#fff;box-shadow:0 4px 14px rgba(58,123,213,.3)}
+        .bpri:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 6px 20px rgba(58,123,213,.45)}
+        .bgrn{background:linear-gradient(135deg,#276749,#2f855a);color:#9ae6b4;box-shadow:0 4px 14px rgba(39,103,73,.35)}
+        .bgrn:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 6px 20px rgba(39,103,73,.5)}
+        .bgh{background:var(--bg3);color:var(--muted);padding:10px 16px;font-size:12px}
+        .bgh:hover:not(:disabled){color:var(--text)}
+        .bout{background:transparent;border:1px solid var(--border);color:var(--muted)}
+        .bout:hover:not(:disabled){border-color:rgba(255,255,255,.2);color:var(--text)}
+        
+        /* SPINNER */
+        .spin{display:inline-block;width:13px;height:13px;border:2px solid rgba(255,255,255,.2);border-top-color:#fff;border-radius:50%;animation:sp .65s linear infinite;flex-shrink:0}
+        @keyframes sp{to{transform:rotate(360deg)}}
+        
+        /* PROVIDER ROWS */
+        .pgrid{display:flex;flex-direction:column;gap:7px;margin-top:16px}
+        .prow{display:flex;align-items:center;gap:10px;background:var(--bg);border:1px solid var(--border);border-radius:9px;padding:10px 13px;transition:border-color var(--tr)}
+        .prow.ok{border-color:rgba(104,211,145,.35)}
+        .prow.fail{border-color:rgba(245,101,101,.35)}
+        .prow.wait{border-color:rgba(99,179,237,.2)}
+        .pname{font-family:var(--mono);font-size:11px;font-weight:700;color:var(--c1);min-width:80px;letter-spacing:.04em;flex-shrink:0}
+        .purl{flex:1;font-family:var(--mono);font-size:10px;color:var(--muted);word-break:break-all;line-height:1.4}
+        .purl.ok{color:#9ae6b4}.purl.err{color:#fc8181;font-style:italic}.purl.pend{color:#3a4254;font-style:italic}
+        .pcopy{background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:5px;padding:4px 9px;font-size:10px;font-family:var(--mono);color:var(--muted);cursor:pointer;flex-shrink:0;transition:all var(--tr);display:none}
+        .pcopy:hover{color:var(--text);border-color:rgba(255,255,255,.2)}
+        
+        /* OUO MANUAL */
+        .ouo-box{display:none;margin-top:8px;padding:10px 13px;background:rgba(246,173,85,.05);border:1px dashed rgba(246,173,85,.3);border-radius:9px;gap:8px;align-items:center;flex-wrap:wrap}
+        .ouo-box.on{display:flex}
+        .ouo-lbl{font-family:var(--mono);font-size:10px;color:var(--c3);white-space:nowrap;font-weight:700}
+        .ouo-box input{flex:1;min-width:160px;background:transparent;border:none;border-bottom:1px solid rgba(246,173,85,.3);border-radius:0;padding:4px 6px;font-family:var(--mono);font-size:11px;color:#fbd38d;outline:none}
+        .ouo-box input::placeholder{color:rgba(246,173,85,.3)}
+        .btnouo{background:rgba(246,173,85,.12);border:1px solid rgba(246,173,85,.35);border-radius:6px;padding:5px 11px;font-size:11px;font-family:var(--mono);color:var(--c3);cursor:pointer;white-space:nowrap;transition:all var(--tr)}
+        .btnouo:hover{background:rgba(246,173,85,.22)}
+        .ouotab{background:rgba(246,173,85,.1);border:1px solid rgba(246,173,85,.3);border-radius:5px;padding:3px 10px;font-size:10px;font-family:var(--mono);color:var(--c3);cursor:pointer;transition:all var(--tr);white-space:nowrap}
+        .ouotab:hover{background:rgba(246,173,85,.2)}
+        
+
+        /* STATS */
+        .stats{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}
+        .chip{display:flex;align-items:center;gap:7px;background:var(--bg);border:1px solid var(--border);border-radius:7px;padding:7px 13px;font-family:var(--mono);font-size:12px}
+        .chip .k{color:var(--muted)}.chip .v{color:var(--text);font-weight:700}
+        
+        /* IMG LIST */
+        .ilist{margin-top:14px;background:var(--bg);border:1px solid var(--border);border-radius:var(--r);overflow:hidden}
+        .ilhdr{display:flex;align-items:center;justify-content:space-between;padding:9px 13px;border-bottom:1px solid var(--border);font-family:var(--mono);font-size:10px;color:var(--muted)}
+        .ilscroll{max-height:150px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--border) transparent}
+        .irow{display:flex;align-items:center;gap:9px;padding:6px 13px;border-bottom:1px solid rgba(255,255,255,.03);font-family:var(--mono);font-size:10px}
+        .irow:last-child{border-bottom:none}
+        .irow .n{color:var(--muted);min-width:22px}.irow .u{color:#93c5fd;flex:1;word-break:break-all;line-height:1.4}
+        .irow .s{color:var(--c4);font-size:9px;padding:1px 5px;border:1px solid rgba(104,211,145,.3);border-radius:3px;flex-shrink:0}
+        
+        /* MEDIA LABEL */
+        .media-wrap{display:flex;gap:8px;align-items:center}
+        .media-wrap input{flex:1}
+        .bsync{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px 13px;font-size:11px;font-family:var(--mono);color:var(--muted);cursor:pointer;white-space:nowrap;flex-shrink:0;transition:all var(--tr)}
+        .bsync:hover{color:var(--text);border-color:rgba(255,255,255,.2)}
+        
+        /* OUTPUT */
+        .outcode{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:var(--r);padding:14px;font-family:var(--mono);font-size:11px;color:#a5c8f0;line-height:1.7;resize:vertical;min-height:240px;outline:none;transition:border-color var(--tr)}
+        .outcode:focus{border-color:rgba(104,211,145,.4)}
+        .outacts{display:flex;gap:9px;margin-top:10px}
+        
+        /* DIVIDER */
+        .div{height:1px;background:var(--border);margin:18px 0}
+        
+        /* RESET ROW */
+        .rrow{display:flex;align-items:center;justify-content:space-between;padding:13px 16px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);margin-top:18px}
+        .rrow p{font-size:13px;color:var(--muted)}
+        
+        /* TOAST */
+        .tarea{position:fixed;bottom:24px;right:20px;z-index:9999;display:flex;flex-direction:column;gap:9px;pointer-events:none}
+        .toast{background:var(--bg3);border:1px solid var(--border);border-radius:9px;padding:10px 16px;font-size:12px;font-family:var(--mono);display:flex;align-items:center;gap:9px;min-width:200px;max-width:300px;pointer-events:all;animation:ti .22s ease,to .3s ease 2.7s forwards;box-shadow:0 8px 24px rgba(0,0,0,.5)}
+        .toast.ok{border-color:rgba(104,211,145,.4);color:#9ae6b4}
+        .toast.warn{border-color:rgba(246,173,85,.4);color:#f6ad55}
+        .toast.err{border-color:rgba(245,101,101,.4);color:#fc8181}
+        @keyframes ti{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+        @keyframes to{to{opacity:0;transform:translateY(6px)}}
+    </style>
+</head>
+
+<body>
+    <div class="wrap">
+
+        <!-- HEADER -->
+        <header class="hdr">
+            <h1>Blogger Post Generator</h1>
+        </header>
+
+        <!-- PIPELINE -->
+        <nav class="pipe" id="pipe">
+            <div class="ps a1" id="ps1">
+                <div class="ps-n"><span>1</span></div>
+                <div class="ps-l">Rút Gọn</div>
+            </div>
+            <div class="pc" id="pc1"></div>
+            <div class="ps" id="ps2">
+                <div class="ps-n"><span>2</span></div>
+                <div class="ps-l">Ảnh</div>
+            </div>
+            <div class="pc" id="pc2"></div>
+            <div class="ps" id="ps3">
+                <div class="ps-n"><span>3</span></div>
+                <div class="ps-l">Metadata</div>
+            </div>
+            <div class="pc" id="pc3"></div>
+            <div class="ps" id="ps4">
+                <div class="ps-n"><span>4</span></div>
+                <div class="ps-l">Output</div>
+            </div>
+        </nav>
+
+        <!-- STEP 1 -->
+        <section class="card on" id="card1">
+            <div class="ch">
+                <span class="badge b1">Bước 01</span>
+                <span class="ct">Rút Gọn Link</span>
+            </div>
+            <div class="fld">
+                <input type="text" id="urlInput" placeholder="https://www.mediafire.com/file/..." autocomplete="off" spellcheck="false">
+            </div>
+            <button class="btn bpri bfull" id="btnShorten">Rút Gọn Link</button>
+            <div class="pgrid" id="pgrid" style="display:none"></div>
+            <div class="ouo-box" id="ouoBox">
+                <span class="ouo-lbl">⚠ Ouo Thủ Công</span>
+                <input type="text" id="ouoInput" placeholder="Dán Link ouo.io/... Vào Đây">
+                <button class="btnouo" id="btnOuoSave">Lưu</button>
+            </div>
+            <button class="btn bgh bfull" id="btnNext1" style="display:none;margin-top:12px">Tiếp Tục →</button>
+        </section>
+
+        <!-- STEP 2 -->
+        <section class="card" id="card2">
+            <div class="ch">
+                <span class="badge b2">Bước 02</span>
+                <span class="ct">Trích Xuất Ảnh</span>
+            </div>
+            <div class="fld">
+                <textarea id="htmlInput" rows="7" placeholder="Dán Toàn Bộ Source HTML Của Trang Ảnh Vào Đây..."></textarea>
+            </div>
+            <button class="btn bpri bfull" id="btnParse">Trích Xuất &amp; Chuẩn Hóa Ảnh</button>
+            <div id="parseResult" style="display:none">
+                <div class="stats" id="statsBar"></div>
+                <div class="ilist" id="ilist"></div>
+            </div>
+            <div style="display:flex;gap:9px;margin-top:12px">
+                <button class="btn bgh" onclick="goStep(1)">← Quay Lại</button>
+                <button class="btn bgh bfull" id="btnNext2" style="display:none">Tiếp Tục →</button>
+            </div>
+        </section>
+
+        <!-- STEP 3 -->
+        <section class="card" id="card3">
+            <div class="ch">
+                <span class="badge b3">Bước 03</span>
+                <span class="ct">Thông Tin Bài Đăng</span>
+            </div>
+            <div class="fld"><label class="lbl" for="inCos">Cosplayer</label><input type="text" id="inCos" placeholder="VD: imOlive"></div>
+            <div class="fld"><label class="lbl" for="inChar">Character</label><input type="text" id="inChar" placeholder="VD: Secretary"></div>
+            <div class="fld"><label class="lbl" for="inSeries">Series</label><input type="text" id="inSeries" placeholder="VD: Unknown"></div>
+            <div class="div"></div>
+            <div class="frow">
+                <div><label class="lbl" for="inPhotos">📸 Số Ảnh</label><input type="text" id="inPhotos" placeholder="Tự Động" oninput="syncLabel()"></div>
+                <div><label class="lbl" for="inVids">🎬 Số Video</label><input type="text" id="inVids" placeholder="0" oninput="syncLabel()"></div>
+            </div>
+            <div class="fld" style="margin-top:14px">
+                <label class="lbl">Nhãn Media</label>
+                <div class="media-wrap">
+                    <input type="text" id="inLabel" placeholder="VD: 26 Photos, 2 Videos" oninput="previewLabel()">
+                    <button class="bsync" id="btnSync">↺ Sync</button>
+                </div>
+            </div>
+            <div style="display:flex;gap:9px;margin-top:6px">
+                <button class="btn bgh" onclick="goStep(2)">← Quay Lại</button>
+                <button class="btn bpri bfull" id="btnGen">Tạo HTML Bài Đăng →</button>
+            </div>
+        </section>
+
+        <!-- STEP 4 -->
+        <section class="card" id="card4">
+            <div class="ch">
+                <span class="badge b4">Bước 04</span>
+                <span class="ct">HTML Hoàn Chỉnh</span>
+            </div>
+            <textarea class="outcode" id="outCode" readonly placeholder="HTML Sẽ Hiện Ở Đây…"></textarea>
+            <div class="outacts">
+                <button class="btn bgrn bfull" id="btnCopy">📋 Copy Toàn Bộ HTML</button>
+                <button class="btn bgh" id="btnDl">↓</button>
+            </div>
+            <div style="margin-top:9px">
+                <button class="btn bgh bfull" onclick="goStep(3)">← Chỉnh Sửa Metadata</button>
+            </div>
+        </section>
+
+        <!-- RESET -->
+        <div class="rrow">
+            <button class="btn bout" id="btnReset">🔄 Reset</button>
+        </div>
+
+    </div>
+    <div class="tarea" id="tarea"></div>
+
+    <script>
+        (function(){
+        'use strict';
+        
+        /* ── CONFIG ─────────────────────────────────────────────────── */
+        var P = [
+          {name:'Shortxlinks', url:'https://shortxlinks.com/api?api=1f67b2840a8d3fe3742bc9f4a48609b3134d7745&url=', t:'json'},
+          {name:'Droplink',    url:'https://droplink.co/api?api=0d9d75a41ee8190c5de30cfcc98cc55edec72786&url=',    t:'json'},
+          {name:'Ez4short',    url:'https://ez4short.com/api?api=62b0e82049eda582bafa22ca67ef2d8326dc6d73&url=',   t:'json'},
+          {name:'Arlinks',     url:'https://arlinks.in/api?api=355e8cef1286cec0d749f6c4c127a447cb313888&url=',    t:'json'},
+          {name:'Ouo',         url:'https://ouo.io/api/uNh6WROg?s=',                                              t:'manual'}
+        ];
+        
+
+        
+        /* ── STATE ──────────────────────────────────────────────────── */
+        var ST = {
+          shortUrls:[null,null,null,null,null],
+          imgUrls:[],
+          photos:0,
+          videos:0
+        };
+        
+        /* ── UTILS ──────────────────────────────────────────────────── */
+        function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
+        function $(id){return document.getElementById(id);}
+        
+        function toast(msg,type){
+          var el=document.createElement('div');
+          el.className='toast '+(type||'ok');
+          el.innerHTML='<span>'+(type==='err'?'✕':type==='warn'?'⚠':'✓')+'</span><span>'+msg+'</span>';
+          $('tarea').appendChild(el);
+          setTimeout(function(){if(el.parentNode)el.parentNode.removeChild(el);},3200);
+        }
+        
+
+        /* ── PIPELINE ───────────────────────────────────────────────── */
+        function goStep(n){
+          for(var i=1;i<=4;i++) $('card'+i).classList.toggle('on',i===n);
+          for(var i=1;i<=4;i++){
+            var ps=$('ps'+i);
+            ps.className='ps';
+            if(i<n) ps.classList.add('done');
+            else if(i===n) ps.classList.add('a'+i);
+          }
+          for(var i=1;i<=3;i++) $('pc'+i).className='pc'+(i<n?' done':'');
+          window.scrollTo({top:0,behavior:'smooth'});
+        }
+        window.goStep=goStep;
+        
+        /* ── STEP 1: SHORTEN ────────────────────────────────────────── */
+        function callOne(provider,origUrl){
+          if(provider.t==='manual') return Promise.reject(new Error('__MANUAL__'));
+          var apiUrl=provider.url+encodeURIComponent(origUrl);
+          return new Promise(function(resolve,reject){
+            var xhr=new XMLHttpRequest();
+            xhr.open('GET',apiUrl,true);
+            xhr.timeout=15000;
+            xhr.onload=function(){
+              if(xhr.status>=200&&xhr.status<300) resolve(xhr.responseText);
+              else reject(new Error('HTTP '+xhr.status));
+            };
+            xhr.onerror=function(){reject(new Error('Network error'));};
+            xhr.ontimeout=function(){reject(new Error('Timeout'));};
+            xhr.send();
+          }).then(function(body){
+            try{
+              var j=JSON.parse(body);
+              if(j.status==='error') throw new Error(j.message||'API error');
+              var keys=['shortenedUrl','short_url','shortLink','url','short'];
+              for(var k=0;k<keys.length;k++){
+                var v=j[keys[k]];
+                if(v&&typeof v==='string'&&v.indexOf('http')===0) return v;
+              }
+            }catch(e){if(e.message&&e.message!=='Unexpected token'&&e.message.indexOf('JSON')<0) throw e;}
+            if(body.indexOf('http')===0) return body;
+            throw new Error('Không Parse Được: '+body.slice(0,50));
+          }).catch(function(e){
+            throw e;
+          });
+        }
+
+        
+        function runShorten(){
+          var urlVal=$('urlInput').value.trim();
+          if(!urlVal){toast('Vui Lòng Nhập URL Gốc','warn');return;}
+          if(!/^https?:\/\//i.test(urlVal)){toast('URL Phải Bắt Đầu Bằng http(s)://','warn');return;}
+        
+          var btn=$('btnShorten');
+          btn.disabled=true;
+          btn.innerHTML='<span class="spin"></span>Đang Rút Gọn…';
+        
+          ST.shortUrls=[null,null,null,null,null];
+          $('btnNext1').style.display='none';
+          $('ouoBox').classList.remove('on');
+        
+          var grid=$('pgrid');
+          grid.style.display='flex';
+          var html='';
+          for(var i=0;i<P.length;i++){
+            html+='<div class="prow wait" id="pr'+i+'">'+
+              '<span class="pname">'+P[i].name+'</span>'+
+              '<span class="purl pend" id="pu'+i+'">Đang Gọi API…</span>'+
+              '<button class="pcopy" id="pc'+i+'">Copy</button>'+
+            '</div>';
+          }
+          grid.innerHTML=html;
+        
+          /* Gắn listener cho copy buttons */
+          for(var i=0;i<P.length;i++){
+            (function(idx){
+              $('pc'+idx).addEventListener('click',function(){
+                if(!ST.shortUrls[idx]) return;
+                copyText(ST.shortUrls[idx],this);
+              });
+            })(i);
+          }
+        
+          var done=0;
+          var total=P.length;
+        
+          P.forEach(function(provider,i){
+            callOne(provider,$('urlInput').value.trim())
+              .then(function(short){
+                ST.shortUrls[i]=short;
+                $('pu'+i).textContent=short;
+                $('pu'+i).className='purl ok';
+                $('pr'+i).className='prow ok';
+                $('pc'+i).style.display='';
+              })
+              .catch(function(e){
+                if(e.message==='__MANUAL__'){
+                  /* Ouo — hiện nút mở tab */
+                  var ouoUrl='https://ouo.io/api/uNh6WROg?s='+encodeURIComponent($('urlInput').value.trim());
+                  $('pu'+i).innerHTML='<button class="ouotab" id="ouoTabBtn">🔗 Mở Tab Lấy Link Ouo</button>';
+                  $('pr'+i).className='prow';
+                  $('ouoBox').classList.add('on');
+                  /* gắn listener sau khi đã inject vào DOM */
+                  setTimeout(function(){
+                    var tb=$('ouoTabBtn');
+                    if(tb) tb.addEventListener('click',function(){
+                      window.open(ouoUrl,'_blank','noopener,noreferrer');
+                      toast('Tab Ouo Đã Mở → Copy URL → Dán Vào Ô Bên Dưới','warn');
+                    });
+                  },50);
+                } else {
+                  $('pu'+i).textContent='Lỗi: '+e.message;
+                  $('pu'+i).className='purl err';
+                  $('pr'+i).className='prow fail';
+                }
+              })
+              .finally(function(){
+                done++;
+                if(done===total){
+                  btn.disabled=false;
+                  btn.innerHTML='Rút Gọn Tất Cả 5 Link';
+                  var ok=ST.shortUrls.filter(Boolean).length;
+                  /* Đếm Ouo thủ công */
+                  var ouoVal=$('ouoInput').value.trim();
+                  if(ouoVal&&ouoVal.indexOf('http')===0) ok++;
+                  if(ok===0){
+                    toast('Tất Cả Link Thất Bại','err');
+                  } else {
+                    toast(ok+'/5 Link Thành Công ✓','ok');
+                    $('btnNext1').style.display='';
+                  }
+                }
+              });
+          });
+        }
+        
+        /* Ouo save thủ công */
+        function saveOuo(){
+          var val=$('ouoInput').value.trim();
+          if(!val){toast('Chưa Nhập Link Ouo','warn');return;}
+          if(val.indexOf('http')<0){toast('Link Không Hợp Lệ','warn');return;}
+          ST.shortUrls[4]=val;
+          $('pu4').textContent=val;
+          $('pu4').className='purl ok';
+          $('pr4').className='prow ok';
+          $('pc4').style.display='';
+          $('ouoBox').classList.remove('on');
+          toast('Đã Lưu Link Ouo ✓','ok');
+          $('btnNext1').style.display='';
+        }
+        
+        /* ── STEP 2: PARSE IMAGES ───────────────────────────────────── */
+        var IMG_E=['.jpg','.jpeg','.png','.gif','.webp','.bmp'];
+        var VID_E=['.mp4','.mov','.avi','.mkv','.webm','.m4v'];
+        
+        function isImg(u){
+          var l=u.toLowerCase();
+          return IMG_E.some(function(e){return l.indexOf(e)>-1;})||
+                 l.indexOf('blogger.googleusercontent.com')>-1||
+                 l.indexOf('lh3.googleusercontent.com')>-1;
+        }
+        function isVid(u){
+          var l=u.toLowerCase();
+          return VID_E.some(function(e){return l.slice(-e.length)===e;});
+        }
+        function s0(url){
+          if(url.indexOf('googleusercontent.com')<0) return url;
+          var n=url.replace(/\/w\d+(?:-h\d+)?(?:-[^/]+)*\//g,'/s0/');
+          n=n.replace(/\/s\d+(?:-[^/]+)*\//g,'/s0/');
+          n=n.replace(/\/s0\/s0\//g,'/s0/');
+          return n;
+        }
+        
+        function runParse(){
+          var raw=$('htmlInput').value.trim();
+          if(!raw){toast('Vui Lòng Dán HTML Vào Ô Bên Trên','warn');return;}
+          var btn=$('btnParse');
+          btn.disabled=true;
+          btn.innerHTML='<span class="spin"></span>Đang Trích Xuất…';
+          setTimeout(function(){
+            var seen=new Set(),imgs=[],vids=0;
+            var re=/(?:src|href)\s*=\s*["']([^"']{10,})["']/gi,m;
+            while((m=re.exec(raw))!==null){
+              var u=m[1].trim();
+              if(!u||/^(javascript|#|data:)/.test(u)) continue;
+              if(isVid(u)){vids++;continue;}
+              if(!isImg(u)) continue;
+              var n=s0(u);
+              if(!seen.has(n)){seen.add(n);imgs.push(n);}
+            }
+            btn.disabled=false;
+            btn.innerHTML='Trích Xuất &amp; Chuẩn Hóa Ảnh';
+            if(!imgs.length){toast('Không Tìm Thấy Ảnh Trong HTML','warn');return;}
+            ST.imgUrls=imgs;ST.photos=imgs.length;ST.videos=vids;
+            /* auto fill step3 */
+            $('inPhotos').value=imgs.length;
+            $('inVids').value=vids;
+            syncLabel();
+            renderParse(imgs,vids);
+            toast(imgs.length+' Ảnh Trích Xuất ✓','ok');
+            $('btnNext2').style.display='';
+            setDone(2);
+          },100);
+        }
+        
+        function renderParse(imgs,vids){
+          $('statsBar').innerHTML=
+            '<div class="chip"><span class="k">📸 Ảnh</span><span class="v">'+imgs.length+'</span></div>'+
+            '<div class="chip"><span class="k">🎬 Video</span><span class="v">'+vids+'</span></div>'+
+            '<div class="chip"><span class="k">✦ Chuẩn Hóa</span><span class="v">/s0/ ✓</span></div>';
+          var rows=imgs.slice(0,60).map(function(u,i){
+            return '<div class="irow"><span class="n">'+(i+1)+'</span><span class="u">'+u+'</span><span class="s">s0</span></div>';
+          }).join('');
+          if(imgs.length>60) rows+='<div class="irow"><span class="u" style="color:var(--muted)">… Và '+(imgs.length-60)+' Ảnh Nữa</span></div>';
+          $('ilist').innerHTML='<div class="ilhdr"><span>URL Ảnh Đã Chuẩn Hóa</span><span>'+imgs.length+' Ảnh</span></div><div class="ilscroll">'+rows+'</div>';
+          $('parseResult').style.display='block';
+        }
+        
+        /* ── STEP 3: METADATA ───────────────────────────────────────── */
+        function syncLabel(){
+          var p=parseInt($('inPhotos').value)||0;
+          var v=parseInt($('inVids').value)||0;
+          var parts=[];
+          if(p>0) parts.push(p+' Photos');
+          if(v>0) parts.push(v+' Videos');
+          var label=parts.join(', ')||'No media';
+          $('inLabel').value=label;
+        }
+        function previewLabel(){}
+        window.syncLabel=syncLabel;
+        window.previewLabel=previewLabel;
+        
+        /* ── STEP 4: GENERATE ───────────────────────────────────────── */
+        function runGen(){
+          if(!ST.imgUrls.length){toast('Chưa Có Ảnh — Hoàn Thành Bước 2 Trước','warn');return;}
+          var cos=$('inCos').value.trim()||'Unknown';
+          var char=$('inChar').value.trim()||'Unknown';
+          var ser=$('inSeries').value.trim()||'Unknown';
+          var label=$('inLabel').value.trim()||'No media';
+          var html=buildPost(cos,char,ser,label);
+          $('outCode').value=html;
+          goStep(4);
+          setDone(3);
+          toast('HTML Tạo Xong! Copy Và Dán Vào Blogger ✓','ok');
+        }
+        
+        function buildGallery(imgs){
+          var total=imgs.length;
+          var t=function(u,a){return '    <img src="'+u+'" alt="'+a+'" loading="lazy">';};
+          var vis=imgs.slice(0,3).map(function(u,i){return t(u,(i+1)+'/'+total);}).join('\n');
+          var bt='';
+          if(imgs[3]) bt='\n    <div class=\'btImg\'>\n'+t(imgs[3],'4/'+total)+'\n        <label for=\'hideImg1\' aria-label=\'Show All Images\'>Show All</label>\n    </div>';
+          var sh='';
+          if(imgs.length>4){
+            var hidden=imgs.slice(4).map(function(u,i){return t(u,(i+5)+'/'+total);}).join('\n');
+            sh='\n    <div class=\'psImg shImg\'>\n'+hidden+'\n    </div>';
+          }
+          return "<input hidden class='inImg' id='hideImg1' type='checkbox'>\n<div class='psImg hdImg'>\n"+vis+bt+sh+"\n</div>";
+        }
+        
+        function buildScript(urls){
+          var lines=urls.map(function(u,i){return "    '"+(u||'')+"',  // "+P[i].name;}).join('\n');
+          return [
+            '<script>',
+            '(function () {',
+            '  var URLS = [',
+            lines,
+            "  ].filter(function(u){return u!=='';});",
+            '  var LAST=URLS.length-1, RESET=6*60*60*1000;',
+            "  var LS_I='lnkRot_index', LS_T='lnkRot_ts';",
+            '  function getIdx(){',
+            '    try{',
+            '      var i=parseInt(localStorage.getItem(LS_I),10);',
+            '      var t=parseInt(localStorage.getItem(LS_T),10);',
+            '      if(isNaN(i)||isNaN(t)) return 0;',
+            '      if(Date.now()-t>=RESET){save(0);return 0;}',
+            '      return Math.min(i,LAST);',
+            '    }catch(e){return 0;}',
+            '  }',
+            '  function save(i){try{localStorage.setItem(LS_I,i);localStorage.setItem(LS_T,Date.now());}catch(e){}}',
+            '  function init(){',
+            "    var btn=document.getElementById('download-btn');",
+            '    if(!btn||!URLS.length) return;',
+            '    var busy=false;',
+            "    btn.addEventListener('click',function(e){",
+            '      e.preventDefault();if(busy)return;busy=true;',
+            '      var i=getIdx(),next=i>=LAST?LAST:i+1;',
+            "      save(next);window.open(URLS[i],'_blank','noopener,noreferrer');",
+            "      setTimeout(function(){busy=false;},500);",
+            '    });',
+            '  }',
+            "  document.readyState==='loading'?document.addEventListener('DOMContentLoaded',init):init();",
+            '})();',
+            '<\/script>'
+          ].join('\n');
+        }
+        
+        function buildPost(cos,char,ser,label){
+          return "<!--[ Alert variant info outlined ]-->\n"+
+            "<div class='alert info outline'><b>File Information!</b>\n"+
+            "    <b><i>Cosplayer:</i></b> <i>"+esc(cos)+"</i> <br>\n"+
+            "    <b><i>Character:</i></b> <i>"+esc(char)+"</i> <br>\n"+
+            "    <b><i>Series:</i></b> <i>"+esc(ser)+"</i>\n"+
+            "</div>\n\n"+
+            "<!--[ Alert variant success outlined ]-->\n"+
+            "<div class='alert success outline'><b>Download Link!</b>\n"+
+            "    <div class='dlBox'>\n"+
+            "        <div class='fN'>\n"+
+            "            <span><b><i>MediaFire</i></b></span>\n"+
+            "            <span class='fS'><i>"+esc(label)+"</i></span>\n"+
+            "        </div>\n"+
+            "        <a id='download-btn' class='button' aria-label='Download' href='javascript:void(0)' rel='nofollow noreferrer noopener'>\n"+
+            "            <i class='icon dl'></i>\n"+
+            "        </a>\n"+
+            "    </div>\n"+
+            "</div>\n\n"+
+            buildGallery(ST.imgUrls)+"\n\n"+
+            buildScript(ST.shortUrls);
+        }
+        
+        /* ── OUTPUT ACTIONS ─────────────────────────────────────────── */
+        function doCopy(){
+          var v=$('outCode').value;
+          if(!v){toast('Chưa Có HTML','warn');return;}
+          var btn=$('btnCopy');
+          navigator.clipboard.writeText(v).then(function(){
+            btn.innerHTML='✅ Đã Copy!';
+            toast('Đã Copy HTML Vào Clipboard ✓','ok');
+            setTimeout(function(){btn.innerHTML='📋 Copy Toàn Bộ HTML';},1800);
+          }).catch(function(){
+            $('outCode').select();document.execCommand('copy');
+            toast('Đã Copy (Fallback) ✓','ok');
+          });
+        }
+        
+        function doDl(){
+          var v=$('outCode').value;
+          if(!v){toast('Chưa Có HTML','warn');return;}
+          var a=document.createElement('a');
+          a.href=URL.createObjectURL(new Blob([v],{type:'text/html'}));
+          a.download='post-'+Date.now()+'.html';
+          a.click();
+          URL.revokeObjectURL(a.href);
+          toast('Đã Tải File ✓','ok');
+        }
+        
+        /* ── RESET ──────────────────────────────────────────────────── */
+        function doReset(){
+          ST={shortUrls:[null,null,null,null,null],imgUrls:[],photos:0,videos:0};
+          ['urlInput','htmlInput','inCos','inChar','inSeries','inPhotos','inVids','inLabel','ouoInput','outCode'].forEach(function(id){$(id).value='';});
+          $('pgrid').style.display='none';$('pgrid').innerHTML='';
+          $('btnNext1').style.display='none';$('btnNext2').style.display='none';
+          $('parseResult').style.display='none';
+          $('ouoBox').classList.remove('on');
+          goStep(1);
+          for(var i=1;i<=4;i++) $('ps'+i).className='ps'+(i===1?' a1':'');
+          for(var i=1;i<=3;i++) $('pc'+i).className='pc';
+          toast('Đã Reset! Sẵn Sàng Tạo Bài Mới','ok');
+        }
+        
+        function setDone(step){
+          for(var i=1;i<=step;i++){
+            $('ps'+i).className='ps done';
+            if(i<4) $('pc'+i).className='pc done';
+          }
+        }
+        
+        function copyText(str,btn){
+          navigator.clipboard.writeText(str).then(function(){
+            var orig=btn.textContent;btn.textContent='✓';
+            setTimeout(function(){btn.textContent=orig;},1500);
+          }).catch(function(){
+            var ta=document.createElement('textarea');
+            ta.value=str;ta.style.cssText='position:fixed;opacity:0';
+            document.body.appendChild(ta);ta.select();document.execCommand('copy');
+            document.body.removeChild(ta);
+          });
+        }
+        
+        /* ── BIND EVENTS ────────────────────────────────────────────── */
+        $('btnShorten').addEventListener('click', runShorten);
+        $('btnNext1').addEventListener('click',   function(){goStep(2);});
+        $('btnParse').addEventListener('click',   runParse);
+        $('btnNext2').addEventListener('click',   function(){goStep(3);});
+        $('btnSync').addEventListener('click',    syncLabel);
+        $('btnGen').addEventListener('click',     runGen);
+        $('btnCopy').addEventListener('click',    doCopy);
+        $('btnDl').addEventListener('click',      doDl);
+        $('btnReset').addEventListener('click',   doReset);
+        $('btnOuoSave').addEventListener('click', saveOuo);
+        $('urlInput').addEventListener('keydown', function(e){if(e.key==='Enter') runShorten();});
+        
+        })();
+    </script>
+</body>
+
+</html>
